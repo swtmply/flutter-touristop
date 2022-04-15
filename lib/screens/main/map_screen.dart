@@ -1,9 +1,13 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:touristop/models/tourist_spot_model.dart';
 import 'package:touristop/providers/user_location_provider.dart';
+import 'package:touristop/services/spots_service.dart';
 
 class MapSample extends StatefulWidget {
   const MapSample({Key? key}) : super(key: key);
@@ -14,7 +18,9 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _controller = Completer();
-  final Set<Marker> _markers = Set();
+  final SpotsService _spotsService = GetIt.I.get<SpotsService>();
+
+  Set<Marker> _markers = {};
   BitmapDescriptor? pinLocationIcon;
 
   @override
@@ -23,9 +29,11 @@ class MapSampleState extends State<MapSample> {
     super.initState();
   }
 
-  void setCustomMapPin() async {
+  // ignore: todo
+  // TODO add custom markers
+  void setCustomMapPin() {
     pinLocationIcon =
-        await BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose);
+        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose);
   }
 
   @override
@@ -47,10 +55,20 @@ class MapSampleState extends State<MapSample> {
           tilt: 59.440717697143555,
         ),
         markers: _markers,
-        onMapCreated: (GoogleMapController controller) {
+        onMapCreated: (GoogleMapController controller) async {
           _controller.complete(controller);
 
+          final listTouristSpot = await _spotsService.listDocuments();
+
           setState(() {
+            _markers = listTouristSpot
+                .map((spot) => Marker(
+                      markerId: MarkerId(spot.name!),
+                      position: spot.position!,
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                          BitmapDescriptor.hueRose),
+                    ))
+                .toSet();
             // Adding user location pin
             _markers.add(
               Marker(
@@ -59,9 +77,6 @@ class MapSampleState extends State<MapSample> {
                 icon: pinLocationIcon!,
               ),
             );
-
-            // ignore: todo
-            // TODO: Adding pin location to every tourist spot
           });
         },
       ),

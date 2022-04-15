@@ -1,15 +1,30 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:touristop/firebase_options.dart';
 import 'package:touristop/providers/user_location_provider.dart';
 import 'package:touristop/screens/main/map_screen.dart';
+import 'package:touristop/services/spots_service.dart';
 
-void main() {
+GetIt locator = GetIt.instance;
+
+void setupSingletons() async {
+  locator.registerLazySingleton<SpotsService>(() => SpotsService());
+}
+
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  setupSingletons();
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => UserLocationProvider(),
-      child: const MyApp(),
-    ),
+    MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => UserLocationProvider()),
+    ], child: const MyApp()),
   );
 }
 
