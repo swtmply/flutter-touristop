@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,7 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _controller = Completer();
-  final Set<Marker> _markers = Set();
+  Set<Marker> _markers = {};
   BitmapDescriptor? pinLocationIcon;
 
   @override
@@ -23,9 +24,11 @@ class MapSampleState extends State<MapSample> {
     super.initState();
   }
 
-  void setCustomMapPin() async {
+  // ignore: todo
+  // TODO add custom markers
+  void setCustomMapPin() {
     pinLocationIcon =
-        await BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose);
+        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose);
   }
 
   @override
@@ -47,11 +50,30 @@ class MapSampleState extends State<MapSample> {
           tilt: 59.440717697143555,
         ),
         markers: _markers,
-        onMapCreated: (GoogleMapController controller) {
+        onMapCreated: (GoogleMapController controller) async {
           _controller.complete(controller);
+
+          // ignore: todo
+          // TODO put this logic in a service
+          // Adding pin location to every tourist spot
+          QuerySnapshot snapshot =
+              await FirebaseFirestore.instance.collection('spots').get();
+
+          final data = snapshot.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data =
+                document.data()! as Map<String, dynamic>;
+
+            return Marker(
+              markerId: MarkerId(data['name']),
+              position: LatLng(data['latitude'], data['longitude']),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueRose),
+            );
+          }).toList();
 
           setState(() {
             // Adding user location pin
+            _markers = data.toSet();
             _markers.add(
               Marker(
                 markerId: const MarkerId('user'),
@@ -59,9 +81,6 @@ class MapSampleState extends State<MapSample> {
                 icon: pinLocationIcon!,
               ),
             );
-
-            // ignore: todo
-            // TODO: Adding pin location to every tourist spot
           });
         },
       ),

@@ -1,10 +1,22 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:touristop/firebase_options.dart';
 import 'package:touristop/providers/user_location_provider.dart';
 import 'package:touristop/screens/main/map_screen.dart';
+import 'package:touristop/services/firebase_service.dart';
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => UserLocationProvider(),
@@ -35,6 +47,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final Stream<QuerySnapshot> _spotsStream =
+      FirebaseFirestore.instance.collection('spots').snapshots();
+
   void _getCurrentLocation() async {
     Position position = await _determinePosition();
     setState(() {
@@ -75,6 +90,41 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _getCurrentLocation();
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       centerTitle: true,
+  //       title: const Text('Omsiman sa Manila'),
+  //     ),
+  //     body: StreamBuilder<QuerySnapshot>(
+  //       stream: _spotsStream,
+  //       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+  //         if (snapshot.hasError) {
+  //           return const Text('Something went wrong');
+  //         }
+
+  //         if (snapshot.connectionState == ConnectionState.waiting) {
+  //           return const CircularProgressIndicator();
+  //         }
+
+  //         return ListView(
+  //           children: snapshot.data!.docs.map((DocumentSnapshot document) {
+  //             Map<String, dynamic> data =
+  //                 document.data()! as Map<String, dynamic>;
+
+  //             return ListTile(
+  //               title: Text(data['name']),
+  //               subtitle: Text(
+  //                   'Latitude: ${data['latitude']} : Longitude: ${data['longitude']}'),
+  //             );
+  //           }).toList(),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
