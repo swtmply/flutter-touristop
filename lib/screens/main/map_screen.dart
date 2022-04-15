@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:touristop/models/tourist_spot_model.dart';
 import 'package:touristop/providers/user_location_provider.dart';
+import 'package:touristop/services/spots_service.dart';
 
 class MapSample extends StatefulWidget {
   const MapSample({Key? key}) : super(key: key);
@@ -15,6 +18,8 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _controller = Completer();
+  final SpotsService _spotsService = GetIt.I.get<SpotsService>();
+
   Set<Marker> _markers = {};
   BitmapDescriptor? pinLocationIcon;
 
@@ -53,27 +58,18 @@ class MapSampleState extends State<MapSample> {
         onMapCreated: (GoogleMapController controller) async {
           _controller.complete(controller);
 
-          // ignore: todo
-          // TODO put this logic in a service
-          // Adding pin location to every tourist spot
-          QuerySnapshot snapshot =
-              await FirebaseFirestore.instance.collection('spots').get();
-
-          final data = snapshot.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data =
-                document.data()! as Map<String, dynamic>;
-
-            return Marker(
-              markerId: MarkerId(data['name']),
-              position: LatLng(data['latitude'], data['longitude']),
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueRose),
-            );
-          }).toList();
+          final listTouristSpot = await _spotsService.listDocuments();
 
           setState(() {
+            _markers = listTouristSpot
+                .map((spot) => Marker(
+                      markerId: MarkerId(spot.name!),
+                      position: spot.position!,
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                          BitmapDescriptor.hueRose),
+                    ))
+                .toSet();
             // Adding user location pin
-            _markers = data.toSet();
             _markers.add(
               Marker(
                 markerId: const MarkerId('user'),
