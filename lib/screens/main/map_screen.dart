@@ -21,7 +21,7 @@ class MapSampleState extends State<MapSample> {
   final SpotsService _spotsService = GetIt.I.get<SpotsService>();
 
   Set<Marker> _markers = {};
-  BitmapDescriptor? pinLocationIcon;
+  BitmapDescriptor? userLocationPin, spotLocationPin;
 
   @override
   void initState() {
@@ -31,9 +31,10 @@ class MapSampleState extends State<MapSample> {
 
   // ignore: todo
   // TODO add custom markers
-  void setCustomMapPin() {
-    pinLocationIcon =
-        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose);
+  Future<void> setCustomMapPin() async {
+    userLocationPin = BitmapDescriptor.defaultMarker;
+    spotLocationPin =
+        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta);
   }
 
   @override
@@ -65,8 +66,7 @@ class MapSampleState extends State<MapSample> {
                 .map((spot) => Marker(
                       markerId: MarkerId(spot.name!),
                       position: spot.position!,
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                          BitmapDescriptor.hueRose),
+                      icon: spotLocationPin!,
                     ))
                 .toSet();
             // Adding user location pin
@@ -74,7 +74,7 @@ class MapSampleState extends State<MapSample> {
               Marker(
                 markerId: const MarkerId('user'),
                 position: userPosition,
-                icon: pinLocationIcon!,
+                icon: userLocationPin!,
               ),
             );
           });
