@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:touristop/firebase_options.dart';
 import 'package:touristop/init.dart';
+import 'package:touristop/providers/dates_provider.dart';
 import 'package:touristop/providers/user_location_provider.dart';
 import 'package:touristop/services/spots_service.dart';
 
@@ -24,6 +25,7 @@ Future main() async {
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider(create: (_) => UserLocationProvider()),
+      ChangeNotifierProvider(create: (_) => DatesProvider()),
     ], child: const MyApp()),
   );
 }

@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:touristop/models/tourist_spot_model.dart';
 import 'package:touristop/providers/user_location_provider.dart';
 import 'package:touristop/services/spots_service.dart';
 
@@ -59,28 +57,32 @@ class MapSampleState extends State<MapSample> {
         onMapCreated: (GoogleMapController controller) async {
           _controller.complete(controller);
 
-          final listTouristSpot = await _spotsService.listDocuments();
-
-          setState(() {
-            _markers = listTouristSpot
-                .map((spot) => Marker(
-                      markerId: MarkerId(spot.name!),
-                      position: spot.position!,
-                      icon: spotLocationPin!,
-                    ))
-                .toSet();
-            // Adding user location pin
-            _markers.add(
-              Marker(
-                markerId: const MarkerId('user'),
-                position: userPosition,
-                icon: userLocationPin!,
-              ),
-            );
-          });
+          await _setMarkersToMap(userPosition);
         },
       ),
     );
+  }
+
+  Future<void> _setMarkersToMap(LatLng userPosition) async {
+    final listTouristSpot = await _spotsService.listDocuments();
+
+    setState(() {
+      _markers = listTouristSpot
+          .map((spot) => Marker(
+                markerId: MarkerId(spot.name!),
+                position: spot.position!,
+                icon: spotLocationPin!,
+              ))
+          .toSet();
+      // Adding user location pin
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('user'),
+          position: userPosition,
+          icon: userLocationPin!,
+        ),
+      );
+    });
   }
 
   // Animate Change of Location Reference
