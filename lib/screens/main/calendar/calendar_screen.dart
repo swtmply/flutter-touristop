@@ -5,6 +5,7 @@ import 'package:touristop/providers/dates_provider.dart';
 import 'package:touristop/screens/main/calendar/widgets/datepicker_calendar.dart';
 import 'package:touristop/screens/main/calendar/widgets/selected_dates.dart';
 import 'package:touristop/screens/main/calendar/widgets/dates_confirm_button.dart';
+import 'package:touristop/widgets/layout.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({Key? key}) : super(key: key);
@@ -17,11 +18,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
   final DateRangePickerController _controller = DateRangePickerController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _controller.selectedDates =
+          Provider.of<DatesProvider>(context, listen: false).dates;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final datesProvider = context.watch<DatesProvider>();
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return AppLayout(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -54,7 +69,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 SelectdDates(controller: _controller),
               ],
             ),
-            DatesConfirmButton(onPressed: () {})
+            DatesConfirmButton(
+                onPressed: () => Navigator.pushNamed(context, '/select-spots'))
           ],
         ),
       ),

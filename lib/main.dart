@@ -7,6 +7,8 @@ import 'package:touristop/firebase_options.dart';
 import 'package:touristop/init.dart';
 import 'package:touristop/providers/dates_provider.dart';
 import 'package:touristop/providers/user_location_provider.dart';
+import 'package:touristop/screens/main/calendar/calendar_screen.dart';
+import 'package:touristop/screens/main/spots_selection/spots_selection_screen.dart';
 import 'package:touristop/services/spots_service.dart';
 import 'package:touristop/theme/colors.dart';
 
@@ -43,7 +45,12 @@ class MyApp extends StatelessWidget {
         ),
         fontFamily: GoogleFonts.inter().fontFamily,
       ),
-      home: const InitPage(),
+      routes: {
+        '/': (context) => const InitPage(),
+        '/calendar': (context) => const CalendarScreen(),
+        '/select-spots': (context) => SpotsSelection()
+      },
+      initialRoute: '/',
     );
   }
 }

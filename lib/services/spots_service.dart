@@ -26,6 +26,7 @@ class SpotsService {
           data['latitude'],
           data['longitude'],
         ),
+        openDates: data['openDates'],
       );
     }).toList();
   }

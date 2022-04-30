@@ -9,48 +9,60 @@ class FromFirebase extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _spotsService.spotsStream(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return const Text('Something went wrong');
-        }
+    return SafeArea(
+      child: StreamBuilder<QuerySnapshot>(
+        stream: _spotsService.spotsStream(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Locations',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 28,
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Locations',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: ListView(
-                children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                  Map<String, dynamic> data =
-                      document.data()! as Map<String, dynamic>;
+              Expanded(
+                child: ListView(
+                  children:
+                      snapshot.data!.docs.map((DocumentSnapshot document) {
+                    Map<String, dynamic> data =
+                        document.data()! as Map<String, dynamic>;
 
-                  return ListTile(
-                    title: Text(data['name']),
-                    subtitle: Text(
-                        'Latitude: ${data['latitude']} : Longitude: ${data['longitude']}'),
-                  );
-                }).toList(),
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(data['name']),
+                          subtitle: Text(
+                              'Latitude: ${data['latitude']} : Longitude: ${data['longitude']}'),
+                        ),
+                        Row(
+                          children: [
+                            Text('Available Dates: ${data['openDates']}'),
+                          ],
+                        )
+                      ],
+                    );
+                  }).toList(),
+                ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
 }
