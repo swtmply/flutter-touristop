@@ -8,6 +8,7 @@ import 'package:touristop/init.dart';
 import 'package:touristop/providers/dates_provider.dart';
 import 'package:touristop/providers/user_location_provider.dart';
 import 'package:touristop/services/spots_service.dart';
+import 'package:touristop/theme/colors.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -35,8 +36,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.pink,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: AppColors.primaryBlue,
+        ),
         fontFamily: GoogleFonts.inter().fontFamily,
       ),
       home: const InitPage(),

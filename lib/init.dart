@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:touristop/providers/user_location_provider.dart';
-import 'package:touristop/screens/main/calendar_screen.dart';
+import 'package:touristop/screens/main/calendar/calendar_screen.dart';
+import 'package:touristop/screens/main/map_screen.dart';
 
 class InitPage extends StatefulWidget {
   const InitPage({Key? key}) : super(key: key);
