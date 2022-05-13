@@ -55,6 +55,12 @@ class _SpotsSelectionState extends State<SpotsSelection> {
                                 day == DateFormat('EE').format(date).toString(),
                             orElse: (() => null));
 
+                        // ignore: todo
+                        // TODO sort by distance
+
+                        // ignore: todo
+                        // TODO create card component
+
                         if (result != null) return Text(data['name']);
                       }
 
